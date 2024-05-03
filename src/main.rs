@@ -3,7 +3,6 @@ use bevy::{
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
 
-
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
@@ -29,20 +28,18 @@ fn set_window_size(mut windows: Query<&mut Window>){
 }
 
 fn key_input(keys: Res<ButtonInput<KeyCode>>, mut rect_pos: Query<&mut Transform, With<Mesh2dHandle>>){
-    //let mut x: f32 = 100.0;
-    if keys.just_pressed(KeyCode::KeyD){
+    if keys.pressed(KeyCode::KeyD){
         for mut rect in &mut rect_pos {
-            rect.translation.x += 70.0;
+            rect.translation.x += 5.0;
             println!("rect x is {}",rect.translation.x);
         }
         println!("Key D pressed!");
     }
-    else if keys.just_pressed(KeyCode::KeyA){
+    else if keys.pressed(KeyCode::KeyA){
         for mut rect in &mut rect_pos {
-            rect.translation.x -= 70.0;
+            rect.translation.x -= 5.0;
             println!("rect x is {}",rect.translation.x);
         }
         println!("Key A pressed!");
     }
-
 }
