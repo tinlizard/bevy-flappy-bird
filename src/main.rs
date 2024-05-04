@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*, 
-    sprite::{MaterialMesh2dBundle, Mesh2d, Mesh2dHandle}
+    sprite::{MaterialMesh2dBundle, Mesh2dHandle}
 };
 
 #[derive(Component)]
