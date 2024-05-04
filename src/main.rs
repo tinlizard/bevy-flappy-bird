@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*, 
-    sprite::{MaterialMesh2dBundle, Mesh2dHandle}
+    sprite::{MaterialMesh2dBundle, Mesh2dHandle}, window::PrimaryWindow
 };
 
 #[derive(Component)]
@@ -53,9 +53,10 @@ fn setup(mut command: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials:
 
 }
 
-fn set_window_size(mut windows: Query<&mut Window>){
+fn set_window_size(mut windows: Query<&mut Window, With<PrimaryWindow>>){
     let mut window = windows.single_mut();
     window.resolution.set(800.0,600.0);
+    window.title = "Example App".to_string();
 }
 
 fn key_input(keys: Res<ButtonInput<KeyCode>>, mut rect_pos: Query<&mut Transform, With<Mesh2dHandle>>, mut sprite_pos: Query<(&mut Transform, &TextureAtlas), Without<Mesh2dHandle>>){
