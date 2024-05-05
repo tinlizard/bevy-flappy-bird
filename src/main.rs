@@ -21,8 +21,13 @@ fn main() {
         .run();
 }
 
-fn setup(mut command: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<ColorMaterial>>, asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>){
+fn setup(
+    mut command: Commands, 
+    mut meshes: ResMut<Assets<Mesh>>, 
+    mut materials: ResMut<Assets<ColorMaterial>>, 
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>
+){
     command.spawn(Camera2dBundle::default());
 
     command.spawn(MaterialMesh2dBundle{
@@ -59,7 +64,11 @@ fn set_window_size(mut windows: Query<&mut Window, With<PrimaryWindow>>){
     window.title = "Example App".to_string();
 }
 
-fn key_input(keys: Res<ButtonInput<KeyCode>>, mut rect_pos: Query<&mut Transform, With<Mesh2dHandle>>, mut sprite_pos: Query<(&mut Transform, &TextureAtlas), Without<Mesh2dHandle>>){
+fn key_input(
+    keys: Res<ButtonInput<KeyCode>>, 
+    mut rect_pos: Query<&mut Transform, With<Mesh2dHandle>>, 
+    mut sprite_pos: Query<(&mut Transform, &TextureAtlas), Without<Mesh2dHandle>>
+){
     if keys.pressed(KeyCode::KeyD){
         for mut rect in &mut rect_pos {
             rect.translation.x += 5.0;
@@ -79,10 +88,21 @@ fn key_input(keys: Res<ButtonInput<KeyCode>>, mut rect_pos: Query<&mut Transform
             rect.translation.x -= 5.0;
         }
         println!("Key A pressed!");
+    } else if keys.pressed(KeyCode::Space){
+        for (mut rect, _sprite) in &mut sprite_pos {
+            rect.translation.y += 2.0;
+        }
+    }
+    for (mut rect, _sprite) in &mut sprite_pos {
+        rect.translation.y -= 1.0;
     }
 }
 
-fn animate_sprite(keys: Res<ButtonInput<KeyCode>>, time: Res<Time>, mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>){
+fn animate_sprite(
+    keys: Res<ButtonInput<KeyCode>>, 
+    time: Res<Time>, 
+    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>, 
+){
     if keys.pressed(KeyCode::Space){
         for (indices, mut timer, mut atlas) in &mut query{
             timer.tick(time.delta());
@@ -95,5 +115,5 @@ fn animate_sprite(keys: Res<ButtonInput<KeyCode>>, time: Res<Time>, mut query: Q
                 };
             }
         }
-    }
+    } 
 }
