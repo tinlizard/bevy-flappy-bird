@@ -1,6 +1,6 @@
 use bevy::{
-    prelude::*, 
-    sprite::{MaterialMesh2dBundle, Mesh2dHandle}, window::PrimaryWindow
+    prelude::*,
+    window::PrimaryWindow
 };
 
 #[derive(Component)]
@@ -17,31 +17,30 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup,(setup,set_window_size).chain())
-        .add_systems(Update, (key_input, animate_sprite))
+        .add_systems(Update, (key_input, animate_sprite, check_offscreen))
         .run();
 }
 
 fn setup(
     mut command: Commands, 
-    mut meshes: ResMut<Assets<Mesh>>, 
-    mut materials: ResMut<Assets<ColorMaterial>>, 
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>
 ){
     command.spawn(Camera2dBundle::default());
 
-    command.spawn(MaterialMesh2dBundle{
-        mesh:  Mesh2dHandle(meshes.add(Rectangle::new(50.0, 100.0))),
-        material: materials.add(Color::rgb(0.0,255.0,0.0)),
-        transform: Transform::from_xyz(100.0, 100.0, 0.0),
-        ..default()
-    });
-
     let texture = asset_server.load("bird_sheet.png");
     let layout = TextureAtlasLayout::from_grid(Vec2::new(34.0, 72.0), 3, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
+
+    let background_texture = asset_server.load("background-day.png");
+
     // Use only the subset of sprites in the sheet that make up the run animation
     let animation_indices = AnimationIndices { first: 0, last: 2};
+
+    command.spawn(SpriteBundle{
+        texture: background_texture,
+        ..default()
+    });
     command.spawn((
         SpriteSheetBundle {
             texture,
@@ -60,37 +59,18 @@ fn setup(
 
 fn set_window_size(mut windows: Query<&mut Window, With<PrimaryWindow>>){
     let mut window = windows.single_mut();
-    window.resolution.set(800.0,600.0);
-    window.title = "Example App".to_string();
+    window.resolution.set(288.0,512.0);
+    window.title = "Flappy Bird".to_string();
 }
 
 fn key_input(
     keys: Res<ButtonInput<KeyCode>>, 
-    mut rect_pos: Query<&mut Transform, With<Mesh2dHandle>>, 
-    mut sprite_pos: Query<(&mut Transform, &TextureAtlas), Without<Mesh2dHandle>>
+    mut sprite_pos: Query<(&mut Transform, &TextureAtlas)>
 ){
-    if keys.pressed(KeyCode::KeyD){
-        for mut rect in &mut rect_pos {
-            rect.translation.x += 5.0;
-            println!("rect x is {}",rect.translation.x);
-        }
-        for (mut rect, _sprite) in &mut sprite_pos {
-            rect.translation.x += 5.0;
-        }
-        println!("Key D pressed!");
-    }
-    else if keys.pressed(KeyCode::KeyA){
-        for mut rect in &mut rect_pos {
-            rect.translation.x -= 5.0;
-            println!("rect x is {}",rect.translation.x);
-        }
-        for (mut rect, _sprite) in &mut sprite_pos {
-            rect.translation.x -= 5.0;
-        }
-        println!("Key A pressed!");
-    } else if keys.pressed(KeyCode::Space){
+     if keys.pressed(KeyCode::Space){
         for (mut rect, _sprite) in &mut sprite_pos {
             rect.translation.y += 2.0;
+            println!("rect y pos is {}",rect.translation.y);
         }
     }
     for (mut rect, _sprite) in &mut sprite_pos {
@@ -116,4 +96,12 @@ fn animate_sprite(
             }
         }
     } 
+}
+
+fn check_offscreen(mut sprite_pos: Query<(&mut Transform, &mut TextureAtlas)>){
+    for (mut rect, _sprite) in &mut sprite_pos {
+        if rect.translation.y < -240.0 {
+            rect.translation.y = 70.0;
+        }
+    }
 }
