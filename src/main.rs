@@ -12,12 +12,27 @@ struct AnimationIndices {
 #[derive(Component, Deref, DerefMut)]
 struct AnimationTimer(Timer);
 
+#[derive(Component)]
+struct Player;
+
+#[derive(Component)]
+struct PipesTop;
+
+#[derive(Component)]
+struct PipesBottom;
+
+#[derive(Component)]
+struct Pipes;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup,(setup,set_window_size).chain())
-        .add_systems(Update, (key_input, animate_sprite, check_offscreen))
+        .add_systems(Startup,(setup,set_window_size,spawn_pipes).chain())
+        .add_systems(Update, 
+            (key_input, 
+            animate_sprite, 
+            check_offscreen,
+            move_pipes))
         .run();
 }
 
@@ -53,6 +68,7 @@ fn setup(
         },
         animation_indices,
         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+        Player
     ));
 
 }
@@ -81,7 +97,7 @@ fn key_input(
 fn animate_sprite(
     keys: Res<ButtonInput<KeyCode>>, 
     time: Res<Time>, 
-    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>, 
+    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas), With<Player>>, 
 ){
     if keys.pressed(KeyCode::Space){
         for (indices, mut timer, mut atlas) in &mut query{
@@ -104,4 +120,36 @@ fn check_offscreen(mut sprite_pos: Query<(&mut Transform, &mut TextureAtlas)>){
             rect.translation.y = 70.0;
         }
     }
+}
+
+fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>){
+    let pipe_top_texture = asset_server.load("top_pipe_green.png");
+    let pipe_bot_texture = asset_server.load("bottom_pipe_green.png");
+    //let pipe_layout = TextureAtlasLayout::from_grid(Vec2::new(52,320), 1,1,None,None);
+    //let pipe_texture_layout = texture_atlas_layouts.add(pipe_layout);
+
+    commands.spawn((
+       SpriteBundle{
+        texture: pipe_top_texture,
+        transform: Transform::from_xyz(100.0, 0.0, 0.0),
+        ..default()
+       },
+        PipesTop,
+        Pipes
+    ));
+    commands.spawn((
+        SpriteBundle{
+         texture: pipe_bot_texture,
+         transform: Transform::from_xyz(100.0, -70.0, 0.0),
+         ..default()
+        },
+         PipesBottom,
+         Pipes
+     ));
+}
+
+fn move_pipes(mut query: Query<&mut Transform, With<Pipes>>){
+        for mut pos in &mut query {
+            pos.translation.x -= 1.0;
+        }
 }
