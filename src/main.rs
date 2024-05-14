@@ -125,8 +125,6 @@ fn check_offscreen(mut sprite_pos: Query<(&mut Transform, &mut TextureAtlas)>){
 fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>){
     let pipe_top_texture = asset_server.load("top_pipe_green.png");
     let pipe_bot_texture = asset_server.load("bottom_pipe_green.png");
-    //let pipe_layout = TextureAtlasLayout::from_grid(Vec2::new(52,320), 1,1,None,None);
-    //let pipe_texture_layout = texture_atlas_layouts.add(pipe_layout);
 
     commands.spawn((
        SpriteBundle{
