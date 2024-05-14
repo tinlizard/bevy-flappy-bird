@@ -146,8 +146,8 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>){
      ));
 }
 
-fn move_pipes(mut query: Query<&mut Transform, With<Pipes>>){
-        for mut pos in &mut query {
+fn move_pipes(mut pipe_pos: Query<&mut Transform, With<Pipes>>){
+        for mut pos in &mut pipe_pos {
             pos.translation.x -= 1.0;
         }
 }
