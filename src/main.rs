@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::{
     prelude::*,
     window::PrimaryWindow
@@ -24,12 +26,17 @@ struct PipesBottom;
 #[derive(Component)]
 struct Pipes;
 
+#[derive(Component)]
+struct PipesTimer {
+    time: Timer,
+}
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup,(setup,set_window_size,spawn_pipes).chain())
+        .add_systems(Startup,(setup,set_window_size).chain())
         .add_systems(Update, 
-            (key_input, 
+            (spawn_pipes,
+            key_input, 
             animate_sprite, 
             check_offscreen,
             move_pipes))
@@ -70,6 +77,9 @@ fn setup(
         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
         Player
     ));
+    command.spawn(PipesTimer {
+        time: Timer::new(Duration::from_secs(2), TimerMode::Repeating),
+    });
 
 }
 
@@ -122,28 +132,38 @@ fn check_offscreen(mut sprite_pos: Query<(&mut Transform, &mut TextureAtlas)>){
     }
 }
 
-fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>){
+fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_query: Query<&mut PipesTimer>, time: Res<Time>){
     let pipe_top_texture = asset_server.load("top_pipe_green.png");
     let pipe_bot_texture = asset_server.load("bottom_pipe_green.png");
 
-    commands.spawn((
-       SpriteBundle{
-        texture: pipe_top_texture,
-        transform: Transform::from_xyz(100.0, 0.0, 0.0),
-        ..default()
-       },
-        PipesTop,
-        Pipes
-    ));
-    commands.spawn((
-        SpriteBundle{
-         texture: pipe_bot_texture,
-         transform: Transform::from_xyz(100.0, -70.0, 0.0),
-         ..default()
-        },
-         PipesBottom,
-         Pipes
-     ));
+    for mut timer in &mut pipe_query {
+        timer.time.tick(time.delta());
+        //println!("time is {:? }", timer.time);
+        if timer.time.finished(){
+            commands.spawn((
+                SpriteBundle{
+                 texture: pipe_top_texture.clone(),
+                 transform:
+                     Transform::from_xyz(100.0, 30.0, 0.0),
+                 ..default()
+                },
+                 PipesTop,
+                 Pipes,
+             ),
+            );
+             commands.spawn((
+                 SpriteBundle{
+                  texture: pipe_bot_texture.clone(),
+                  transform:
+                     Transform::from_xyz(100.0, -70.0, 0.0),
+                  ..default()
+                 },
+                  PipesBottom,
+                  Pipes,
+              ));
+        }
+    }
+    
 }
 
 fn move_pipes(mut pipe_pos: Query<&mut Transform, With<Pipes>>){
