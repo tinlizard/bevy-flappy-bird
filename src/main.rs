@@ -30,6 +30,9 @@ struct Pipes;
 struct PipesTimer {
     time: Timer,
 }
+#[derive(Component)]
+struct GetPos;
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
@@ -149,6 +152,7 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
                 },
                  PipesTop,
                  Pipes,
+                 GetPos,
              ),
             );
              commands.spawn((
@@ -160,14 +164,19 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
                  },
                   PipesBottom,
                   Pipes,
+                  GetPos,
               ));
         }
     }
     
 }
 
-fn move_pipes(mut pipe_pos: Query<&mut Transform, With<Pipes>>){
-        for mut pos in &mut pipe_pos {
+fn move_pipes(mut command: Commands, mut pipes: Query<(Entity, &mut Transform), With<Pipes>>){
+        for (pipe, mut pos) in &mut pipes {
             pos.translation.x -= 1.0;
+
+            if pos.translation.x < -100.0 {
+                    command.entity(pipe).despawn();
+            }
         }
 }
