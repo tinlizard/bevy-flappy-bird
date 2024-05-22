@@ -30,8 +30,6 @@ struct Pipes;
 struct PipesTimer {
     time: Timer,
 }
-#[derive(Component)]
-struct GetPos;
 
 fn main() {
     App::new()
@@ -81,7 +79,7 @@ fn setup(
         Player
     ));
     command.spawn(PipesTimer {
-        time: Timer::new(Duration::from_secs(2), TimerMode::Repeating),
+        time: Timer::new(Duration::from_secs(1), TimerMode::Repeating),
     });
 
 }
@@ -152,7 +150,6 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
                 },
                  PipesTop,
                  Pipes,
-                 GetPos,
              ),
             );
              commands.spawn((
@@ -164,7 +161,6 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
                  },
                   PipesBottom,
                   Pipes,
-                  GetPos,
               ));
         }
     }
