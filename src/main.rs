@@ -145,7 +145,7 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
                 SpriteBundle{
                  texture: pipe_top_texture.clone(),
                  transform:
-                     Transform::from_xyz(100.0, 30.0, 0.0),
+                     Transform::from_xyz(120.0, 30.0, 0.0),
                  ..default()
                 },
                  PipesTop,
@@ -156,7 +156,7 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
                  SpriteBundle{
                   texture: pipe_bot_texture.clone(),
                   transform:
-                     Transform::from_xyz(100.0, -70.0, 0.0),
+                     Transform::from_xyz(120.0, -70.0, 0.0),
                   ..default()
                  },
                   PipesBottom,
@@ -171,7 +171,7 @@ fn move_pipes(mut command: Commands, mut pipes: Query<(Entity, &mut Transform), 
         for (pipe, mut pos) in &mut pipes {
             pos.translation.x -= 1.0;
 
-            if pos.translation.x < -100.0 {
+            if pos.translation.x < -160.0 {
                     command.entity(pipe).despawn();
             }
         }
