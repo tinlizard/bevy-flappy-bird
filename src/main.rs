@@ -1,8 +1,8 @@
 use std::time::Duration;
 
 use bevy::{
-    prelude::*,
-    window::PrimaryWindow,
+    prelude::*, 
+    window::PrimaryWindow
 };
 
 #[derive(Component)]
@@ -36,14 +36,15 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_systems(Startup,(setup,set_window_size).chain())
         .add_systems(Update, 
-            (spawn_pipes,
-            key_input, 
+            (spawn_pipes, 
+            key_input,
             animate_sprite, 
             check_offscreen,
             move_pipes))
         .run();
 }
 
+//setup basic stuff and spawn intial Entities
 fn setup(
     mut command: Commands, 
     asset_server: Res<AssetServer>,
@@ -84,12 +85,14 @@ fn setup(
 
 }
 
+//set window size at initialization
 fn set_window_size(mut windows: Query<&mut Window, With<PrimaryWindow>>){
     let mut window = windows.single_mut();
     window.resolution.set(288.0,512.0);
     window.title = "Flappy Bird".to_string();
 }
 
+//change position of player when the space key is pressed
 fn key_input(
     keys: Res<ButtonInput<KeyCode>>, 
     mut sprite_pos: Query<(&mut Transform, &TextureAtlas)>
@@ -97,7 +100,7 @@ fn key_input(
      if keys.pressed(KeyCode::Space){
         for (mut rect, _sprite) in &mut sprite_pos {
             rect.translation.y += 2.0;
-            println!("rect y pos is {}",rect.translation.y);
+            //println!("rect y pos is {}",rect.translation.y);
         }
     }
     for (mut rect, _sprite) in &mut sprite_pos {
@@ -105,6 +108,8 @@ fn key_input(
     }
 }
 
+
+//animate bird flapping when space key is pressed
 fn animate_sprite(
     keys: Res<ButtonInput<KeyCode>>, 
     time: Res<Time>, 
@@ -125,14 +130,20 @@ fn animate_sprite(
     } 
 }
 
-fn check_offscreen(mut sprite_pos: Query<(&mut Transform, &mut TextureAtlas)>){
+//check if the player is dead (offscreen)
+fn check_offscreen(mut command: Commands,mut sprite_pos: Query<(&mut Transform, &mut TextureAtlas)>, pipes: Query<Entity, With<Pipes>>){
+    //reset bird position if the player dies (goes offscreen), and despawn all pipes 
     for (mut rect, _sprite) in &mut sprite_pos {
         if rect.translation.y < -240.0 {
             rect.translation.y = 70.0;
+            for pipe in &pipes {
+                command.entity(pipe).despawn();
+            }
         }
     }
 }
 
+//spawn pipes on a timer
 fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_query: Query<&mut PipesTimer>, time: Res<Time>){
     let pipe_top_texture = asset_server.load("top_pipe_green.png");
     let pipe_bot_texture = asset_server.load("bottom_pipe_green.png");
@@ -167,6 +178,7 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
     
 }
 
+//move pipes
 fn move_pipes(mut command: Commands, mut pipes: Query<(Entity, &mut Transform), With<Pipes>>){
         for (pipe, mut pos) in &mut pipes {
             pos.translation.x -= 1.0;
