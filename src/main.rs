@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bevy::{
     prelude::*,
-    window::PrimaryWindow
+    window::PrimaryWindow,
 };
 
 #[derive(Component)]
@@ -171,7 +171,7 @@ fn move_pipes(mut command: Commands, mut pipes: Query<(Entity, &mut Transform), 
         for (pipe, mut pos) in &mut pipes {
             pos.translation.x -= 1.0;
 
-            if pos.translation.x < -160.0 {
+            if pos.translation.x < -170.0 {
                     command.entity(pipe).despawn();
             }
         }
