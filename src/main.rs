@@ -80,7 +80,7 @@ fn setup(
         Player
     ));
     command.spawn(PipesTimer {
-        time: Timer::new(Duration::from_secs(1), TimerMode::Repeating),
+        time: Timer::new(Duration::from_secs_f32(1.5), TimerMode::Repeating),
     });
 
 }
@@ -187,7 +187,7 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
 //move pipes
 fn move_pipes(mut command: Commands, mut pipes: Query<(Entity, &mut Transform), With<Pipes>>){
         for (pipe, mut pos) in &mut pipes {
-            pos.translation.x -= 1.0;
+            pos.translation.x -= 0.7;
 
             if pos.translation.x < -170.0 {
                     command.entity(pipe).despawn();
