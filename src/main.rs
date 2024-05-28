@@ -1,5 +1,5 @@
 use std::time::Duration;
-
+use rand::prelude::*;
 use bevy::{
     prelude::*, 
     window::PrimaryWindow
@@ -99,12 +99,12 @@ fn key_input(
 ){
      if keys.pressed(KeyCode::Space){
         for (mut rect, _sprite) in &mut sprite_pos {
-            rect.translation.y += 2.0;
+            rect.translation.y += 4.0;
             //println!("rect y pos is {}",rect.translation.y);
         }
     }
     for (mut rect, _sprite) in &mut sprite_pos {
-        rect.translation.y -= 1.0;
+        rect.translation.y -= 2.1;
     }
 }
 
@@ -152,11 +152,17 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
         timer.time.tick(time.delta());
         //println!("time is {:? }", timer.time);
         if timer.time.finished(){
+            /*generate a random number between zero and 1 to be used for the randomized y coordinates for the pipe 
+            spawn locations */
+            let mut rng = rand::thread_rng();
+            let rand_num: f32 = rng.gen();  
+
+            //spawn pipes 
             commands.spawn((
                 SpriteBundle{
                  texture: pipe_top_texture.clone(),
                  transform:
-                     Transform::from_xyz(120.0, 30.0, 0.0),
+                     Transform::from_xyz(140.0, (rand_num*100.0)+220.0, 0.0),
                  ..default()
                 },
                  PipesTop,
@@ -167,7 +173,7 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
                  SpriteBundle{
                   texture: pipe_bot_texture.clone(),
                   transform:
-                     Transform::from_xyz(120.0, -70.0, 0.0),
+                     Transform::from_xyz(140.0, -200.0+(rand_num*100.0), 0.0),
                   ..default()
                  },
                   PipesBottom,
