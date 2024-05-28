@@ -162,7 +162,7 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
                 SpriteBundle{
                  texture: pipe_top_texture.clone(),
                  transform:
-                     Transform::from_xyz(140.0, (rand_num*100.0)+220.0, 0.0),
+                     Transform::from_xyz(160.0, (rand_num*100.0)+220.0, 0.0),
                  ..default()
                 },
                  PipesTop,
@@ -173,7 +173,7 @@ fn spawn_pipes(mut commands: Commands, asset_server: Res<AssetServer>, mut pipe_
                  SpriteBundle{
                   texture: pipe_bot_texture.clone(),
                   transform:
-                     Transform::from_xyz(140.0, -200.0+(rand_num*100.0), 0.0),
+                     Transform::from_xyz(160.0, -200.0+(rand_num*100.0), 0.0),
                   ..default()
                  },
                   PipesBottom,
